@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.yelo" name="Yelo" version="0.0.3" provider-name="shycoderX">
+<addon id="plugin.video.yelo" name="Yelo" version="0.0.4" provider-name="shycoderX">
     <requires>
         <import addon="xbmc.python" version="2.26.0"/>
         <import addon="script.module.inputstreamhelper" version="0.3.3"/>
@@ -10,8 +10,20 @@
     </extension>
     <extension point="xbmc.addon.metadata">
         <summary lang="en_GB">Stream live streams from Yelo Play</summary>
+		<description lang="en_GB">Stream live streams from Yelo Play</description>
         <language>nl</language>
         <platform>all</platform>
+        <news>
+            v0.0.2
+            - First working build
+
+            v0.0.3
+            - Fixed entitlement issue partially
+
+            v0.0.4
+            - Notify user about wrong login credentials and continent restriction
+
+	    </news>
         <license>GNU General Public License, v3</license>
         <email>shycoderX@protonmail.com</email>
         <source>https://github.com/shycoderX/repo-plugins/tree/leia/plugin.video.yelo</source>

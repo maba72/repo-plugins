@@ -84,15 +84,20 @@ class Tokens:
         self._register_device()
         self._authorize()
 
-
         self._login_do()
 
         callback_url = self._authorize()
-        self._callback(callback_url)
 
-        self._verify_token()
-        self._request_OAuthTokens()
-        self._request_entitlement()
+        if self._callback(callback_url):
+            self._verify_token()
+            self._request_OAuthTokens()
+            self._request_entitlement()
+
+            return True
+        else:
+            self.kodi_wrapper.dialog_ok("Login failed",
+                                        "Please check your login details.")
+            return False
 
     def _login_do(self):
         creds = helperclasses.Credentials(self.kodi_wrapper)
@@ -107,9 +112,15 @@ class Tokens:
 
     def _callback(self, url):
         callbackKey = regex(r"(?<=code=)\w{0,32}", url)
+
+        if not callbackKey:
+            return False
+
         self.save_json_to_file("callbackKey.json", {"callbackKey": callbackKey})
 
         self.make_request("GET", url, default_headers, None, None, False, None, self.testing)
+
+        return True
 
     def _verify_token(self):
         Ids = self.fetch_Ids()
@@ -285,7 +296,6 @@ class YeloPlay(Tokens):
     def play_live_stream(self, stream_url):
         bit_rate = helperclasses.BitRate(self.kodi_wrapper)
 
-
         accessToken = self.fetch_OAuthTokens()["accessToken"]
         deviceId = self.fetch_Ids()["deviceId"]
         customerId = self.fetch_customer_id(accessToken)
@@ -304,9 +314,14 @@ class YeloPlay(Tokens):
                                       False, None, self.testing)
 
                 j = r.json()
-                return j["stream"]["streamDescriptor"]["manifest"]
+
+                if not j.get("errors"):
+                    return j["stream"]["streamDescriptor"]["manifest"]
+                else:
+                    if j["errors"][0]["code"] == "EPG_RESTRICTED_EUROPE":
+                        self.kodi_wrapper.dialog_ok("RESTRICTED",
+                                                    "This channel is only available within Europe.")
+                        return False
             except ValueError:
                 """ Session might be expired """
                 self.login()
-
-
